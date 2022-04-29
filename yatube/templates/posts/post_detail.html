@@ -22,7 +22,9 @@
       </ul>
     </aside>
     <article class="col-12 col-md-9">
-      <p>{{ post.text }}</p>
+      <p>
+        {{ post.text }}
+      </p>
       <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">Редактировать запись</a>
     </article>
   </div>

@@ -2,9 +2,11 @@
 {% block title %}<title>Записи сообщества {{ group.title }}</title>{% endblock %}
 {% block header1 %}{{ group.title }}{% endblock %}
 {% block content %}
-{% if group.description %}  
-<p>{{ group.description }}</p>
-{% endif %} 
+  {% if group.description %}
+    <p>
+      {{ group.description }}
+    </p>
+  {% endif %}
   {% for post in page_obj %}
     <article>
       <ul>
@@ -14,7 +16,9 @@
         </li>
         <li>Дата публикации: {{ post.pub_date|date:"d E Y" }}</li>
       </ul>
-      <p>{{ post.text }}</p>
+      <p>
+        {{ post.text }}
+      </p>
       <a href="{% url 'posts:post_detail' post.id %}">подробная информация</a>
     </article>
     {% if post.group %}
