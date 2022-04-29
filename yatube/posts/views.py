@@ -29,15 +29,15 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    user = User.objects.get(username=username)
-    posts = Post.objects.filter(author=user)
+    author = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=author)
     posts_count = posts.count()
-    name = user.get_full_name()
+    name = author.get_full_name()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'user': user,
+        'author': author,
         'name': name,
         'posts': posts,
         'page_obj': page_obj,
@@ -51,9 +51,7 @@ def post_detail(request, post_id):
     post = related.get(pk=post_id)
     posts_count = related.filter(author=post.author).count()
     name = post.author.get_full_name()
-    user = post.author
     context = {
-        'user': user,
         'name': name,
         'related': related,
         'post': post,

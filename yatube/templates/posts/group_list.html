@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}<title>Записи сообщества {{ group.title }}</title>{% endblock %}
-{% block header1 %}Записи сообщества {{ group.title }}{% endblock %}
+{% block header1 %}{{ group.title }}{% endblock %}
 {% block content %}
   {% for post in page_obj %}
     <article>

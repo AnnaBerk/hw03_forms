@@ -7,8 +7,8 @@
     <article>
       <ul>
         <li>
-          Автор: {{ name }}
-          <a href="{% url 'posts:profile' user %}">все посты пользователя</a>
+          Автор: {{ name }} 
+          <a href="{% url 'posts:profile' post.author %}">все посты пользователя</a>
         </li>
         <li>Дата публикации: {{ post.pub_date|date:"d E Y" }}</li>
       </ul>
