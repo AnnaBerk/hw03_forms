@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Post, Group, User
 from .forms import PostForm
+from django.contrib.auth.decorators import login_required
 
 
 def get_page_context(queryset, request):
@@ -34,15 +35,9 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=author)
-    posts_count = posts.count()
-    name = author.get_full_name()
-    page_obj = get_page_context(posts, request)
+    page_obj = get_page_context(Post.objects.filter(author=author), request)
     context = {
         'author': author,
-        'name': name,
-        'posts': posts,
-        'posts_count': posts_count,
         'page_obj': page_obj,
     }
     return render(request, 'posts/profile.html', context)
@@ -50,18 +45,14 @@ def profile(request, username):
 
 def post_detail(request, post_id):
     related = Post.objects.select_related('author', 'group')
-    post = related.get(pk=post_id)
-    posts_count = related.filter(author=post.author).count()
-    name = post.author.get_full_name()
+    post = get_object_or_404(related, pk=post_id)
     context = {
-        'name': name,
-        'related': related,
         'post': post,
-        'posts_count': posts_count,
     }
     return render(request, 'posts/post_detail.html', context)
 
 
+@login_required
 def post_create(request):
     form = PostForm(request.POST or None)
     if form.is_valid():
@@ -73,6 +64,7 @@ def post_create(request):
     return render(request, 'posts/create_post.html', context)
 
 
+@login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
@@ -82,5 +74,9 @@ def post_edit(request, post_id):
         if form.is_valid():
             form.save()
             return redirect('posts:post_detail', post_id)
-        context = {'form': form, 'is_edit': True}
+        context = {
+            'form': form,
+            'is_edit': True,
+            'post_id': post_id,
+        }
         return render(request, 'posts/create_post.html', context)
