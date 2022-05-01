@@ -14,8 +14,8 @@
         <div class="card-body">
           {% load user_filters %}
           {% if is_edit %}
-          <form method="post" action="{% url 'posts:post_edit' post_id %}">
-            {% else %}
+            <form method="post" action="{% url 'posts:post_edit' post_id %}">
+          {% else %}
             <form method="post" action="{% url 'posts:post_create' %}">
           {% endif %}
             {% csrf_token %}
