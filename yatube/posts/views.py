@@ -8,25 +8,27 @@ def get_page_context(queryset, request):
     paginator = Paginator(queryset, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return {
-        'paginator': paginator,
-        'page_number': page_number,
-        'page_obj': page_obj,
-    }
+    return page_obj
 
 
 def index(request):
-    context = get_page_context(Post.objects.all(), request)
+    posts = Post.objects.all()
+    page_obj = get_page_context(posts, request)
+    context = {
+        'page_obj': page_obj
+    }
     return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts_group.all()
+    page_obj = get_page_context(posts, request)
     context = {
         'group': group,
+        'posts': posts,
+        'page_obj': page_obj,
     }
-    context.update(get_page_context(posts, request))
     return render(request, 'posts/group_list.html', context)
 
 
@@ -35,13 +37,14 @@ def profile(request, username):
     posts = Post.objects.filter(author=author)
     posts_count = posts.count()
     name = author.get_full_name()
+    page_obj = get_page_context(posts, request)
     context = {
         'author': author,
         'name': name,
         'posts': posts,
         'posts_count': posts_count,
+        'page_obj': page_obj,
     }
-    context.update(get_page_context(posts, request))
     return render(request, 'posts/profile.html', context)
 
 
