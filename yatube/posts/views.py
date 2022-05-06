@@ -27,7 +27,6 @@ def group_posts(request, slug):
     page_obj = get_page_context(posts, request)
     context = {
         'group': group,
-        'posts': posts,
         'page_obj': page_obj,
     }
     return render(request, 'posts/group_list.html', context)
@@ -70,7 +69,7 @@ def post_edit(request, post_id):
     if request.user != post.author:
         return redirect('posts:post_detail', post_id)
     else:
-        form = PostForm(request.POST or None, instance=post)
+        form = PostForm(request.POST or None, instance=post or None)
         if form.is_valid():
             form.save()
             return redirect('posts:post_detail', post_id)

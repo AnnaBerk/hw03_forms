@@ -7,7 +7,7 @@
         <li class="list-group-item">Дата публикации: {{ post.pub_date|date:"d E Y" }}</li>
         {% if post.group %}
           <li class="list-group-item">
-            Группа: {{ post.group.title }}
+            Группа: {{ post.group.title }} 
             <br>
             <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
           </li>
