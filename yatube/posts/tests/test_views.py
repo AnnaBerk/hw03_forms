@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from datetime import datetime, date
+from django import forms
 
 from ..models import Post, Group
 
@@ -20,7 +21,7 @@ class GroupURLTests(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост больше 15 симовлов',
+            text='Тестовый пост больше 15 символов',
             group=cls.group,
         )
 
@@ -61,7 +62,7 @@ class GroupURLTests(TestCase):
         post_group_0 = first_object.group.title
         post_pub_date_0 = first_object.pub_date
         self.assertEqual(post_aurhor_0, 'auth')
-        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 символов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
 
@@ -78,7 +79,7 @@ class GroupURLTests(TestCase):
         post_pub_date_0 = first_object.pub_date
         self.assertEqual(group_object, 'group')
         self.assertEqual(post_aurhor_0, 'auth')
-        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 символов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
 
@@ -95,7 +96,7 @@ class GroupURLTests(TestCase):
         post_pub_date_0 = first_object.pub_date
         self.assertEqual(author_object, 'auth')
         self.assertEqual(post_aurhor_0, 'auth')
-        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 символов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
 
@@ -110,6 +111,18 @@ class GroupURLTests(TestCase):
         post_group_0 = first_object.group.title
         post_pub_date_0 = first_object.pub_date
         self.assertEqual(post_aurhor_0, 'auth')
-        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 символов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
+
+    def test_post_create_page_show_correct_context(self):
+        """Шаблон post_create сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse('posts:post_create'))
+        form_fields = {   
+            'text': forms.fields.CharField,
+            'group': forms.fields.ChoiceField,
+        }
+        for value, expected in form_fields.items():
+            with self.subTest(value=value):
+                form_field = response.context.get('form').fields.get(value)
+                self.assertIsInstance(form_field, expected)
