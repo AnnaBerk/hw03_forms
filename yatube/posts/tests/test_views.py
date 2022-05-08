@@ -152,11 +152,22 @@ class PaginatorViewsTest(TestCase):
             description='Тестовое описание',
             slug='slug',
         )
-        for i in range(0, 13):
+        cls.group2 = Group.objects.create(
+            title='group2',
+            description='Тестовое описание2',
+            slug='slug2',
+        )
+        for _ in range(0, 13):
             cls.post = Post.objects.create(
                 author=cls.user,
-                text=f'Тестовый пост {i}',
+                text='Тестовый пост',
                 group=cls.group,
+            )
+        for _ in range(0, 5):
+            cls.post = Post.objects.create(
+                author=cls.user,
+                text='Тестовый пост',
+                group=cls.group2,
             )
 
     def setUp(self):
@@ -170,4 +181,28 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_contains_three_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']), 8)
+
+    def test_group_list_page_contains_ten_records(self):
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={'slug': 'slug'})
+        )
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_group2_list_page_contains_five_records(self):
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={'slug': 'slug2'})
+        )
+        self.assertEqual(len(response.context['page_obj']), 5)
+
+    def test_first_page_profile_contains_ten_records(self):
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': 'auth'})
+        )
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_second_page_profile_contains_three_records(self):
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': 'auth'}) + '?page=2'
+        )
+        self.assertEqual(len(response.context['page_obj']), 8)
