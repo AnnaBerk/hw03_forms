@@ -19,6 +19,11 @@ class GroupViewTests(TestCase):
             description='Тестовое описание',
             slug='slug',
         )
+        cls.group2 = Group.objects.create(
+            title='group2',
+            description='Тестовое описание2',
+            slug='slug2',
+        )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост больше 15 символов',
@@ -29,6 +34,15 @@ class GroupViewTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        
+    def test_group_list_page_show_correct_context(self):
+        """Пост group2 не попал на страницу записей group."""
+        response = self.authorized_client.get(reverse(
+            'posts:group_list', kwargs={'slug': 'slug'}
+        ))
+        first_object = response.context['page_obj'][0]
+        post_group_0 = first_object.group.title
+        self.assertNotEqual(post_group_0, 'group2')    
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -206,39 +220,3 @@ class PaginatorViewsTest(TestCase):
             'posts:profile', kwargs={'username': 'auth'}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 8)
-
-
-class GroupCreatePostTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
-        cls.group = Group.objects.create(
-            title='group',
-            description='Тестовое описание',
-            slug='slug',
-        )
-        cls.post = Post.objects.create(
-            author=cls.user,
-            text='Тестовый пост больше 15 символов',
-            group=cls.group,
-        )
-        cls.group2 = Group.objects.create(
-            title='group2',
-            description='Тестовое описание2',
-            slug='slug2',
-        )
-
-    def setUp(self):
-        self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
-
-    def test_group_list_page_show_correct_context(self):
-        """Пост group2 не попал на страницу записей group."""
-        response = self.authorized_client.get(reverse(
-            'posts:group_list', kwargs={'slug': 'slug'}
-        ))
-        first_object = response.context['page_obj'][0]
-        post_group_0 = first_object.group.title
-        self.assertNotEqual(post_group_0, 'group2')
