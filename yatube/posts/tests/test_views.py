@@ -52,7 +52,7 @@ class GroupURLTests(TestCase):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_task_list_page_show_correct_context(self):
+    def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         first_object = response.context['page_obj'][0]
@@ -64,3 +64,18 @@ class GroupURLTests(TestCase):
         self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
+
+    def test_group_list_page_show_correct_context(self):
+        """Шаблон group_list сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse('posts:group_list', kwargs={'slug': 'slug'}))
+        group_object = response.context['group'].title
+        first_object = response.context['page_obj'][0]
+        post_aurhor_0 = first_object.author.username
+        post_text_0 = first_object.text
+        post_group_0 = first_object.group.title
+        post_pub_date_0 = first_object.pub_date
+        self.assertEqual(group_object, 'group')
+        self.assertEqual(post_aurhor_0, 'auth')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_group_0, 'group')
+        self.assertEqual(datetime.date(post_pub_date_0), date.today())    
