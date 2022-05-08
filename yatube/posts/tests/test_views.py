@@ -98,3 +98,18 @@ class GroupURLTests(TestCase):
         self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
         self.assertEqual(post_group_0, 'group')
         self.assertEqual(datetime.date(post_pub_date_0), date.today())
+
+    def test_post_detail_page_show_correct_context(self):
+        """Шаблон post_detail сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse(
+            'posts:post_detail', kwargs={'post_id': '1'}
+        ))
+        first_object = response.context['post']
+        post_aurhor_0 = first_object.author.username
+        post_text_0 = first_object.text
+        post_group_0 = first_object.group.title
+        post_pub_date_0 = first_object.pub_date
+        self.assertEqual(post_aurhor_0, 'auth')
+        self.assertEqual(post_text_0, 'Тестовый пост больше 15 симовлов')
+        self.assertEqual(post_group_0, 'group')
+        self.assertEqual(datetime.date(post_pub_date_0), date.today())
