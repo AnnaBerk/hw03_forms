@@ -9,7 +9,7 @@ from ..models import Post, Group
 User = get_user_model()
 
 
-class GroupURLTests(TestCase):
+class GroupViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -179,7 +179,7 @@ class PaginatorViewsTest(TestCase):
         response = self.client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_second_page_contains_three_records(self):
+    def test_second_page_contains_eight_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 8)
 
@@ -201,8 +201,44 @@ class PaginatorViewsTest(TestCase):
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_second_page_profile_contains_three_records(self):
+    def test_second_page_profile_contains_eight_records(self):
         response = self.client.get(reverse(
             'posts:profile', kwargs={'username': 'auth'}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 8)
+
+
+class GroupCreatePostTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.group = Group.objects.create(
+            title='group',
+            description='Тестовое описание',
+            slug='slug',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост больше 15 символов',
+            group=cls.group,
+        )
+        cls.group2 = Group.objects.create(
+            title='group2',
+            description='Тестовое описание2',
+            slug='slug2',
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_group_list_page_show_correct_context(self):
+        """Пост group2 не попал на страницу записей group."""
+        response = self.authorized_client.get(reverse(
+            'posts:group_list', kwargs={'slug': 'slug'}
+        ))
+        first_object = response.context['page_obj'][0]
+        post_group_0 = first_object.group.title
+        self.assertNotEqual(post_group_0, 'group2')
