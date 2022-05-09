@@ -34,7 +34,7 @@ class GroupViewTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        
+
     def test_group_list_page_show_correct_context(self):
         """Пост group2 не попал на страницу записей group."""
         response = self.authorized_client.get(reverse(
@@ -42,7 +42,7 @@ class GroupViewTests(TestCase):
         ))
         first_object = response.context['page_obj'][0]
         post_group_0 = first_object.group.title
-        self.assertNotEqual(post_group_0, 'group2')    
+        self.assertNotEqual(post_group_0, 'group2')
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -69,7 +69,7 @@ class GroupViewTests(TestCase):
 
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('posts:index'))
+        response = self.guest_client.get(reverse('posts:index'))
         first_object = response.context['page_obj'][0]
         post_aurhor_0 = first_object.author.username
         post_text_0 = first_object.text
@@ -82,7 +82,7 @@ class GroupViewTests(TestCase):
 
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse(
+        response = self.guest_client.get(reverse(
             'posts:group_list', kwargs={'slug': 'slug'}
         ))
         group_object = response.context['group'].title
@@ -99,7 +99,7 @@ class GroupViewTests(TestCase):
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse(
+        response = self.guest_client.get(reverse(
             'posts:profile', kwargs={'username': 'auth'}
         ))
         author_object = response.context['author'].username
@@ -116,7 +116,7 @@ class GroupViewTests(TestCase):
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse(
+        response = self.guest_client.get(reverse(
             'posts:post_detail', kwargs={'post_id': '1'}
         ))
         first_object = response.context['post']
