@@ -17,6 +17,11 @@ class PostCreateFormTests(TestCase):
             description='Тестовое описание',
             slug='slug',
         )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост больше 15 симовлов',
+            group=cls.group,
+        )
 
     def setUp(self):
         self.authorized_client = Client()
@@ -40,5 +45,27 @@ class PostCreateFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Текст из формы',
+            ).exists()
+        )
+
+    def test_can_edit_post(self):
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Текст из формы',
+            'group.title': 'group',
+        }
+        response = self.authorized_client.post(
+            reverse('posts:post_edit', kwargs={'post_id': '1'}),
+            data=form_data,
+            follow=True,
+        )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': '1'})
+        )
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertTrue(
+            Post.objects.filter(
+                text='Текст из формы',
+                id='1'
             ).exists()
         )

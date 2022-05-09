@@ -141,8 +141,8 @@ class GroupViewTests(TestCase):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
 
-    def test_post_create_page_show_correct_context(self):
-        """Шаблон post_create сформирован с правильным контекстом."""
+    def test_post_edit_page_show_correct_context(self):
+        """Шаблон post_edit сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_edit', kwargs={'post_id': '1'})
         )
