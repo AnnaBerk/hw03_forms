@@ -35,8 +35,8 @@ python -m venv venv
 ```bash
 source venv/bin/activate
 ```
+для OS Windows
 ```bash
-# для OS Windows
 source venv/Scripts/activate
 ```
 Установить зависимости:
